@@ -8,7 +8,6 @@ import requests
 
 
 app = Flask(__name__)
-server = app.server
 CORS(app, supports_credentials=True)
 
 # Backup season average Data
