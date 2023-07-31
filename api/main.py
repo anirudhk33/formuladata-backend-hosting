@@ -1,3 +1,4 @@
+print("Imports have started")
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pandas as pd
@@ -5,7 +6,7 @@ import scrape
 from tensorflow import keras
 import numpy as np
 import requests
-
+print("Imports complete")
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -215,6 +216,7 @@ df_avgFP2Pos["season"] = 2023
 df_avgFP3Pos = pd.DataFrame(avgFP3Pos.items(), columns=["Driver", "fp3_pos"])
 df_avgFP3Pos["season"] = 2023
 
+print("Function Definitions Over")
 
 # Google Drive file ID
 file_id = '1dVKzWsdiImuWDDQ9CnRFSHK0Lcr_xK6P'
@@ -223,6 +225,8 @@ url = f'https://drive.google.com/uc?id={file_id}'
 
 # Read the CSV file directly from the URL into a DataFrame
 df = pd.read_csv(url)
+
+print("Downloaded URL")
 
 
 # df = pd.read_csv('/Users/anirudhkrishna/GitHub/FormulaData/csv-data/cleaned_race_data.csv')
@@ -416,9 +420,11 @@ def get_predictions():
         scrapePractice = value
 
     if scrapePractice == "yes":
+        print("Scraping Data")
         FP1_results = scrape.FP_scrape_results(2023,2024,1, location)
         FP2_results = scrape.FP_scrape_results(2023,2024,2, location)
         FP3_results = scrape.FP_scrape_results(2023,2024,3, location)
+        print("Scraped Data")
 
     try:
         FP1_results["Driver"] = FP1_results["Driver"].apply(scrape.parse_driver_name)
@@ -496,18 +502,19 @@ def get_predictions():
     X_fl = fl_data.drop('in_top_5', axis=1) 
 
 
+    print("Scraping Location Details")
     fps = get_fps(free_practice_results)
     location_arr = get_location_details(convert_location_string(location), circuit_details)
     round = locationRounds.index(convert_location_string(location))+1
-    print(fps)
-    print(location_arr)
-    print(round)
 
+    
+    print("Models have started running")
 
     results_fl = get_race_results_with_fp(driver_team_mapping, 2023, round, convert_location_string(location), location_arr, 'dry', X_fl, fl_model, fps)
     results_quali = get_race_results_with_fp(driver_team_mapping, 2023, round, convert_location_string(location), location_arr, 'dry', X_quali, quali_model, fps)
     results_race = get_race_results_with_fp(driver_team_mapping, 2023, round, convert_location_string(location), location_arr, 'dry', X_race, race_model, fps)
 
+    print("Models have run")
 
     driver_results = {}
 
@@ -521,7 +528,7 @@ def get_predictions():
             "fl_probability": str(prob_fl)
         }
         driver_results[driver] = driver_dict
-    # print(driver_results)
+    print("Returning Results")
     return jsonify(driver_results)
 
 
