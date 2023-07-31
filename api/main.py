@@ -152,13 +152,17 @@ def get_location_details(location, df):
 
 def get_race_results_with_fp(map, season, round, location, location_arr, weather, XX, model, fps):
     race_results = {}
-    weather_dict = {'dry':0, "cloudy":1, "wet":2}
+    weather_dict = {'dry': 0, "cloudy": 1, "wet": 2}
     latitude = location_arr[0]
     longitude = location_arr[1]
     circuit_length = location_arr[2]
 
+    datapoints = []
+    drivers = []
+    teams = []
+
     for driver, team in map.items():
-        datapoint = [0]*XX.shape[1]
+        datapoint = [0] * XX.shape[1]
         datapoint[0] = season
         datapoint[1] = round
         datapoint[2] = weather_dict[weather]
@@ -181,16 +185,24 @@ def get_race_results_with_fp(map, season, round, location, location_arr, weather
         loc = location.lower().replace(' ', '_')
         location_index = XX.columns.get_loc(f'location_{loc}')
         datapoint[location_index] = 1
-    
+
         driver_index = XX.columns.get_loc(f'driver_name_{driver}')
         team_index = XX.columns.get_loc(f'constructor_name_{team}')
         datapoint[driver_index] = 1
         datapoint[team_index] = 1
 
-        df = pd.DataFrame([datapoint], columns=XX.columns)
-        test_prediction = model.predict(df ,verbose=0)
-        race_results[driver] = test_prediction[0][0]
+        datapoints.append(datapoint)
+        drivers.append(driver)
+        teams.append(team)
+
+    df = pd.DataFrame(datapoints, columns=XX.columns)
+    test_predictions = model.predict(df, verbose=0)
+
+    for i in range(len(drivers)):
+        race_results[drivers[i]] = test_predictions[i][0]
+
     return race_results
+
 
 
 def get_fps(fpdf):
