@@ -151,6 +151,7 @@ def get_location_details(location, df):
 
 
 def get_race_results_with_fp(map, season, round, location, location_arr, weather, XX, model, fps):
+
     race_results = {}
     weather_dict = {'dry': 0, "cloudy": 1, "wet": 2}
     latitude = location_arr[0]
